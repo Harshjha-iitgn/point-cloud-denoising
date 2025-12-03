@@ -1,0 +1,107 @@
+# ============================================================
+#   Latent P2P-Bridge with Semantic-Attention Autoencoder
+#   (PU-Net Dataset, double-copy project)
+# ============================================================
+
+name: latent_punet_run
+save_dir: "/home/seema/P2PBridge-edit copy/copy/outputs/"
+
+# ------------------------------------------------------------
+#  Dataset setup
+# ------------------------------------------------------------
+data:
+  data_dir: "/home/seema/P2PBridge-edit copy/copy/data/PU_NET/"
+  dataset: PUNet
+  augment: true
+  use_rgb_features: false
+  workers: 4
+  npoints: 2048
+
+# ------------------------------------------------------------
+#  Diffusion model configuration
+# ------------------------------------------------------------
+diffusion:
+  timesteps: 1000
+  sampling_timesteps: 10
+  objective: pred_noise
+  schedule: linear
+  sampling_strategy: DDPM
+  loss_type: mse
+  beta_start: 1.0e-4
+  beta_end: 0.02
+  t0: 1.0e-4
+  T: 1.0
+  ot_ode: true
+
+# ------------------------------------------------------------
+#  Model setup: Latent Diffusion Bridge with frozen Semantic AE
+# ------------------------------------------------------------
+model:
+  model_type: semantic_ae           # ← key fix (was "type")
+  ema: true
+  ema_decay: 0.999
+
+  in_dim: 3
+  out_dim: 3
+  feat_dim: 512
+  latent_dim: 512
+  use_dino: false
+  use_cross_attn: false
+  use_offset_attn: true
+  dropout: 0.15
+  normal_head: true
+
+  # ---- Autoencoder checkpoint ----
+  ae_ckpt: "/home/seema/P2PBridge-edit copy/copy/checkpoints_ae_retrain/ae_epoch_200.pth"
+  ae_freeze: true
+
+# ------------------------------------------------------------
+#  Training configuration
+# ------------------------------------------------------------
+training:
+  optimizer:
+    type: AdamW
+    lr: 5e-5
+    beta1: 0.9
+    beta2: 0.999
+    weight_decay: 1.0e-4
+
+  scheduler:
+    type: cosine
+    min_lr: 5.0e-6
+
+  grad_clip:
+    enabled: true
+    value: 0.5
+
+  bs: 32
+  amp: true
+  epochs: 400
+  steps: 450000
+  accumulation_steps: 1
+  log_interval: 10
+  save_interval: 10000
+  viz_interval: 10000
+  seed: 42
+  ckpt_dir: "/home/seema/P2PBridge-edit copy/copy/checkpoints_latent"
+
+# ------------------------------------------------------------
+#  Sampling setup
+# ------------------------------------------------------------
+sampling:
+  bs: 32
+  num_iter: 8
+
+# ------------------------------------------------------------
+#  Runtime / parallelism
+# ------------------------------------------------------------
+distribution_type: single
+local_rank: 0
+restart: false
+model_path: ""
+use_ema: true
+
+
+
+
+

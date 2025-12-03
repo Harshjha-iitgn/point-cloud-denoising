@@ -1,0 +1,44 @@
+# ============================================================
+#   Standalone AE retraining (Latent-conditioned Semantic-AE)
+# ============================================================
+
+data:
+  data_dir: "/home/seema/P2PBridge-edit copy/copy/data/PU_NET/PUNet/pointclouds/train/10000_poisson/"
+  dataset: PUNet
+  augment: true
+  use_rgb_features: false
+  workers: 4
+  npoints: 2048
+
+model:
+  model_type: semantic_ae        # required for loader to pick SemanticAutoencoder
+  in_dim: 3
+  feat_dim: 512
+  use_dino: false
+  dino_dim: 384
+  sem_dim: 128
+  use_cross_attn: true
+  use_offset_attn: true
+
+training:
+  bs: 32
+  epochs: 200
+  save_interval: 10
+  ckpt_dir: "/home/seema/P2PBridge-edit copy/copy/checkpoints_ae_retrain"
+  optimizer:
+    type: AdamW
+    lr: 5.0e-5
+    beta1: 0.9
+    beta2: 0.999
+    weight_decay: 1.0e-4
+
+  scheduler:
+    type: cosine
+    min_lr: 1.0e-6
+
+distribution_type: single
+local_rank: 0
+restart: false
+model_path: ""
+use_ema: false
+

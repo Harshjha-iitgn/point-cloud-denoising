@@ -1,0 +1,61 @@
+data:
+  data_dir: /home/seema/P2PBridge-edit copy/copy/data/PU_NET/
+  dataset: PUNet
+  augment: true
+  use_rgb_features: false
+  workers: 4
+  npoints: 2048
+diffusion:
+  timesteps: 1000
+  sampling_timesteps: 10
+  objective: pred_noise
+  schedule: linear
+  sampling_strategy: DDPM
+  loss_type: mse
+  beta_start: 0.0001
+  beta_end: 0.02
+  t0: 0.0001
+  T: 1.0
+  ot_ode: true
+model:
+  model_type: semantic_ae
+  ema: true
+  ema_decay: 0.999
+  in_dim: 3
+  out_dim: 3
+  feat_dim: 512
+  latent_dim: 512
+  use_dino: false
+  use_cross_attn: false
+  use_offset_attn: true
+  dropout: 0.15
+  normal_head: true
+  ae_ckpt: /home/seema/P2PBridge-edit copy/copy/checkpoints_ae_retrain/ae_epoch_200.pth
+  ae_freeze: true
+sampling:
+  bs: 32
+  num_iter: 8
+training:
+  optimizer:
+    type: AdamW
+    lr: 5.0e-05
+    beta1: 0.9
+    beta2: 0.999
+    weight_decay: 0.0001
+  scheduler:
+    type: cosine
+    min_lr: 5.0e-06
+  grad_clip:
+    enabled: true
+    value: 0.5
+  bs: 32
+  amp: true
+  epochs: 400
+  steps: 450000
+  accumulation_steps: 1
+  log_interval: 10
+  save_interval: 10000
+  viz_interval: 10000
+  seed: 42
+  ckpt_dir: /home/seema/P2PBridge-edit copy/copy/checkpoints_latent
+  max_epochs: 1000
